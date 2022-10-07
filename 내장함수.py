@@ -50,7 +50,7 @@ def positive(number):
 # filter는 filter객체로 반환되기에 list로 변환 필요
 print(list(filter(positive,  [-1, -3, -2, 22, 1.523, 999])))
 
-# lambda로도 구현 가능
+# lambda로도 구현가능: 일회성 사용 목적으로 함수 생성은 메모리 낭비 유발
 # lambda [매개변수] : [수행문]
 print(list(filter(lambda x : x > 0, [-1, -3, -2, 22, 1.523, 999])))
 
@@ -124,3 +124,25 @@ print(sum((23,4,5)))
 # zip(*iterable): 동일한 개수로 이루어진 자료형을 묶어주는 역할
 #                 *iterable은 반복가능(iterable)한 자료형 '여러 개' 입력 가능을 의미
 print(list(zip(['a', 'b', 'c'], [1,2,3], [1.1, 2.2, 3.3])))
+
+# reduce(function, iterable): 반복가능한(iterable) 자료형 내 각 요소를 연산 뒤 이전 연산 결과들과 누적해서 반환해주는 함수
+# reduce 함수 사용하지 않은 코드
+def sum(x, y):
+    return x+y
+
+target = list(range(1, 21)) # 1~20 정수 반환
+result = 0
+for value in target:
+    result = sum(result, value)
+print(result)
+
+# reduce 함수 사용
+from functools import reduce
+def sum(x, y):
+    return x+y
+target = list(range(1, 21))
+print(reduce(sum, target))
+
+# reduce 함수 + lambda 표현
+print(reduce(lambda x, y : x+y, target)) # reduce함수는 '누적', map함수는 list로 각 항목을 모아서 반환
+
