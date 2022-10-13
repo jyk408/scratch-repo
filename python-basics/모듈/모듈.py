@@ -5,7 +5,7 @@
 
 # import [모듈이름]
 import Module1
-print(Module1.add(4,2))
+print(Module1.add(4, 2))
 
 # from [모듈이름] import [모듈함수]
 from Module1 import sub # 모듈 함수를 바로 사용하기 위함
