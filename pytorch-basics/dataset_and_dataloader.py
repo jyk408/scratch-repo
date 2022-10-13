@@ -5,7 +5,7 @@ DataLoader: dataset을 샘플에 접근할 수 있또록 iterable(순회가능�
 """
 
 import torch
-from torch.utils.data import dataset
+from torch.utils.data import dataset, Dataset
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
@@ -48,3 +48,51 @@ for i in range(1, cols*rows + 1): # figure 9개 표출
     plt.title(labels_map[label])
     plt.imshow(image.squeeze(), cmap="gray")
 plt.show()
+
+# 파일에서 사용자 정의 데이터셋 만들기: Dataset클래스는 반드시 __init__, __len__, __getitem__이 구현되어야 한다
+import os
+import pandas as pd
+from torchvision.io import read_image
+
+class CustomImageDataset(Dataset):
+
+    def __init__(self, annotations_file, image_directory, transform=None, target_transform=None):
+        self.image_labels = pd.read_csv(annotations_file, names=['file_name', 'label'])
+        self.image_directory = image_directory
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.image_labels)
+
+    def __getitem__(self, index):
+        image_path = os.path.join(self.image_directory, self.image_labels.iloc[index, 0])
+        image = read_image(image_path)
+        label = self.image_labels.iloc[index, 1]
+        if self.transform:
+            image = self.transform(image)
+        if self.target_transform:
+            label = self.target_transform(label)
+
+        return image, label
+
+
+# DataLoader로 학습용 데이터 준비하기
+from torch.utils.data import DataLoader
+
+## DataLoader에 dataset을 넘겨 안에 샘플을 순회(iterate)
+train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
+test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
+
+train_features, train_labels = next(iter(train_dataloader)) # train_dataset의 샘플을 64개씩 묶어 이미지 순서를 섞은 후 묶음(batch)를 반환
+print(f"Feature batch shape: {train_features.size()}")
+print(f"Label batch shape: {train_labels.size()}")
+
+# 묶음(batch)의 첫 번째 feature와 label(정답)을 추출
+image = train_features[0].squeeze()
+label = train_labels[0]
+plt.imshow(image, cmap="gray") # 해당 이미지를 plot에 넘겨 gray색상으로 화면에 출력
+plt.show()
+print(f"Label: {label}")
+
+
